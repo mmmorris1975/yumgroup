@@ -20,17 +20,17 @@ platforms.each_pair do |p, v|
 
       it 'installs yum group test_group' do
         expect(chef_run).to install_yumgroup('install test_group').with(group: 'test_group')
-        expect(chef_run).to run_execute 'yum -d0 -e0 -y  groupinstall test_group'
+        expect(chef_run).to run_execute 'yum -d0 -e0 -y  groupinstall \'test_group\''
       end
 
       it 'upgrades yum group test_group' do
         expect(chef_run).to upgrade_yumgroup('upgrade test_group').with(group: 'test_group')
-        expect(chef_run).to run_execute 'yum -d0 -e0 -y  groupupdate test_group'
+        expect(chef_run).to run_execute 'yum -d0 -e0 -y  groupupdate \'test_group\''
       end
 
       it 'removes yum group test_group' do
         expect(chef_run).to remove_yumgroup('remove test_group').with(group: 'test_group')
-        expect(chef_run).to run_execute 'yum -d0 -e0 -y  groupremove test_group'
+        expect(chef_run).to run_execute 'yum -d0 -e0 -y  groupremove \'test_group\''
       end
     end
   end
