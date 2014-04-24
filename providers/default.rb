@@ -14,12 +14,12 @@ yum_base_cmd = 'yum -d0 -e0 -y'
 
 action :install do
   # The package type definition in the group can be controlled by a setting called
-  # group_package_types. By default, this is 'mandatory', but could also be 'optional',
-  # or 'default'. We'll keep this behavior, and allow someone to change it via the
-  # options attribute
+  # group_package_types. By default, this is 'mandatory' (which appears to include all
+  # 'default' packages, as well), but could also be 'optional', or 'default'. We'll keep
+  # this default behavior, and allow someone to change it via the options attribute.
 
   grp = @new_resource.group
-  cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupinstall #{grp}"
+  cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupinstall '#{grp}'"
 
   converge_by "Installing yum group #{grp}" do
     execute cmd
@@ -32,7 +32,7 @@ action :upgrade do
   # subtle change in behavior
 
   grp = @new_resource.group
-  cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupupdate #{grp}"
+  cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupupdate '#{grp}'"
 
   converge_by "Upgrading yum group #{grp}" do
     execute cmd
@@ -48,7 +48,7 @@ action :remove do
   # not required by other installed packages.
 
   grp = @new_resource.group
-  cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupremove #{grp}"
+  cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupremove '#{grp}'"
 
   converge_by "Deleting yum group #{grp}" do
     execute cmd

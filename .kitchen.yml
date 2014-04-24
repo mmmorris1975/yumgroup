@@ -13,10 +13,18 @@ platforms:
   - name: centos-6.5
   - name: fedora-18
   - name: fedora-19
-  - name: fedroa-20
+  - name: fedora-20
 
 suites:
-  - name: default
+  - name: install
     run_list:
-      - recipe[yumgroup::default]
+      - recipe[yumgroup::_kitchen_install]
+    attributes:
+  - name: upgrade
+    run_list:
+      - recipe[yumgroup::_kitchen_upgrade]
+    attributes:
+  - name: remove
+    run_list:
+      - recipe[yumgroup::_kitchen_remove]
     attributes:

@@ -8,7 +8,7 @@ platforms = {
 
 platforms.each_pair do |p, v|
   Array(v).each do |ver|
-    describe 'yumgroup::test' do
+    describe 'yumgroup::_test' do
       # Use an explicit subject
       let(:chef_run) do
         ChefSpec::Runner.new(platform: p.to_s, version: ver, log_level: :warn, step_into: ['yumgroup']) do |node|
