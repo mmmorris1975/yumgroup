@@ -2,6 +2,10 @@
 # we're simply going to trust in the idempotentcy of the yum commands.  We may need to make
 # this a bit more robust in the future (a la Chef's yum_package provider), but I need a quick
 # and dirty now.
+#
+# First TODOs:
+#  - Fail if specified group does not exist for :install and :upgrade
+#  - Do _not_ fail if group is not installed during :remove
 
 # Support whyrun
 def whyrun_supported?
@@ -53,8 +57,4 @@ action :remove do
   converge_by "Deleting yum group #{grp}" do
     execute cmd
   end
-end
-
-def shell_sanitize(str)
-  str ? str.strip.shellescape : ''
 end

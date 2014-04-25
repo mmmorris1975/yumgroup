@@ -1,7 +1,7 @@
-yumgroup 'Web Server' do
+yumgroup node['yum'][node['platform']]['group'] do
   action :install
 end
 
-yumgroup 'Web Server' do
+yumgroup node['yum'][node['platform']]['group'] do
   action :remove
 end
