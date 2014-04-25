@@ -7,7 +7,8 @@ Requirements
 ------------
 
 #### platforms
-Any platform that supports installing packages via yum using yum groups.
+Any platform that supports installing packages via yum using yum groups.  
+NOTE: Fedora 18 will work with the :install and :upgrade actions, however the :remove action may be flaky, and attempt to delete everything in the dependency tree (regardless of the value of the groupremove_leaf_only setting!)
 
 Usage
 -----
