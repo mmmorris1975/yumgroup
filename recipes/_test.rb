@@ -12,3 +12,15 @@ yumgroup 'remove test_group' do
   group 'test_group'
   action :remove
 end
+
+yumgroup 'install with flush_cache' do
+  group 'cache_group'
+  flush_cache [:before]
+  action :install
+end
+
+yumgroup 'upgrade with flush_cache' do
+  group 'cache_group'
+  flush_cache [:after]
+  action :upgrade
+end

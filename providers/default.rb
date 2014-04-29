@@ -16,6 +16,13 @@ end
 # controls debug and error level output, as well as automatically accepting all prompts
 yum_base_cmd = 'yum -d0 -e0 -y'
 
+def flush_cache(res, sym, action, name)
+  execute "yum makecache #{sym} #{action} #{name}" do
+    command 'yum -d0 -e0 -y makecache'
+    only_if { res && res.include?(sym.to_sym) }
+  end
+end
+
 action :install do
   # The package type definition in the group can be controlled by a setting called
   # group_package_types. By default, this is 'mandatory' (which appears to include all
@@ -26,7 +33,9 @@ action :install do
   cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupinstall '#{grp}'"
 
   converge_by "Installing yum group #{grp}" do
+    flush_cache(@new_resource.flush_cache, 'before', 'install', grp)
     execute cmd
+    flush_cache(@new_resource.flush_cache, 'after', 'install', grp)
   end
 end
 
@@ -39,7 +48,9 @@ action :upgrade do
   cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupupdate '#{grp}'"
 
   converge_by "Upgrading yum group #{grp}" do
+    flush_cache(@new_resource.flush_cache, 'before', 'upgrade', grp)
     execute cmd
+    flush_cache(@new_resource.flush_cache, 'after', 'upgrade', grp)
   end
 end
 
@@ -55,6 +66,8 @@ action :remove do
   cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupremove '#{grp}'"
 
   converge_by "Deleting yum group #{grp}" do
+    flush_cache(@new_resource.flush_cache, 'before', 'remove', grp)
     execute cmd
+    flush_cache(@new_resource.flush_cache, 'after', 'remove', grp)
   end
 end
