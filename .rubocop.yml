@@ -13,3 +13,7 @@ MethodLength:
 HashSyntax:
   Exclude:
     - Rakefile
+
+GuardClause:
+  Exclude:
+    - providers/default.rb 
