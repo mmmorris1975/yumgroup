@@ -17,9 +17,26 @@ end
 yum_base_cmd = 'yum -d0 -e0 -y'
 
 def flush_cache(res, sym, action, name)
-  execute "yum makecache #{sym} #{action} #{name}" do
-    command 'yum -d0 -e0 -y makecache'
-    only_if { res && res.include?(sym.to_sym) }
+  fatal = res.cache_error_fatal
+  flush = res.flush_cache
+
+  # If we want cache update errors to be fatal, we need to remove the local metadata so
+  # that when yum tries to fetch the remote data again, it will be seen as a failure.
+  # If yum has a local copy it can use, the makecache action will never fail and fall
+  # back to using the local metadata instead of raising an error saying there was a
+  # problem updating the metadata for a repository.
+  #
+  # NOTE: this will make metadata updates take much longer!
+  #
+  if flush && flush.include?(sym.to_sym)
+    execute "yum clean metadata #{sym} #{action} #{name}" do
+      command 'yum -d0 -e0 -y clean metadata'
+      only_if { fatal }
+    end
+
+    execute "yum makecache #{sym} #{action} #{name}" do
+      command 'yum -d0 -e0 -y makecache'
+    end
   end
 end
 
@@ -33,9 +50,9 @@ action :install do
   cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupinstall '#{grp}'"
 
   converge_by "Installing yum group #{grp}" do
-    flush_cache(@new_resource.flush_cache, 'before', 'install', grp)
+    flush_cache(@new_resource, 'before', 'install', grp)
     execute cmd
-    flush_cache(@new_resource.flush_cache, 'after', 'install', grp)
+    flush_cache(@new_resource, 'after', 'install', grp)
   end
 end
 
@@ -48,9 +65,9 @@ action :upgrade do
   cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupupdate '#{grp}'"
 
   converge_by "Upgrading yum group #{grp}" do
-    flush_cache(@new_resource.flush_cache, 'before', 'upgrade', grp)
+    flush_cache(@new_resource, 'before', 'upgrade', grp)
     execute cmd
-    flush_cache(@new_resource.flush_cache, 'after', 'upgrade', grp)
+    flush_cache(@new_resource, 'after', 'upgrade', grp)
   end
 end
 
@@ -66,8 +83,8 @@ action :remove do
   cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupremove '#{grp}'"
 
   converge_by "Deleting yum group #{grp}" do
-    flush_cache(@new_resource.flush_cache, 'before', 'remove', grp)
+    flush_cache(@new_resource, 'before', 'remove', grp)
     execute cmd
-    flush_cache(@new_resource.flush_cache, 'after', 'remove', grp)
+    flush_cache(@new_resource, 'after', 'remove', grp)
   end
 end

@@ -10,7 +10,7 @@ yum_makecache_cmd = 'yum -d0 -e0 -y makecache'
 
 platforms.each_pair do |p, v|
   Array(v).each do |ver|
-    describe 'yumgroup::_test' do
+    describe 'yumgroup::_chefspec' do
       # Use an explicit subject
       let(:chef_run) do
         ChefSpec::Runner.new(platform: p.to_s, version: ver, log_level: :warn, step_into: ['yumgroup']) do |node|
@@ -56,23 +56,74 @@ platforms.each_pair do |p, v|
       it 'installs yum group cache_group and flushes cache before' do
         before_cache_cmd = 'yum makecache before install cache_group'
         after_cache_cmd  = 'yum makecache after install cache_group'
+        cache_clean_cmd  = 'yum clean metadata before install cache_group'
 
         expect(chef_run).to install_yumgroup('install with flush_cache').with(flush_cache: [:before])
         expect(chef_run).to run_execute 'yum -d0 -e0 -y  groupinstall \'cache_group\''
 
         expect(chef_run).to run_execute(before_cache_cmd).with(command: yum_makecache_cmd)
         expect(chef_run).to_not run_execute(after_cache_cmd)
+        expect(chef_run).to_not run_execute(cache_clean_cmd)
+
+        exe = chef_run.execute(cache_clean_cmd)
+        expect(exe).to do_nothing
       end
 
       it 'upgrades yum group cache_group and flushes cache after' do
         before_cache_cmd = 'yum makecache before upgrade cache_group'
         after_cache_cmd  = 'yum makecache after upgrade cache_group'
+        cache_clean_cmd  = 'yum clean metadata after upgrade cache_group'
 
         expect(chef_run).to upgrade_yumgroup('upgrade with flush_cache').with(flush_cache: [:after])
         expect(chef_run).to run_execute 'yum -d0 -e0 -y  groupupdate \'cache_group\''
 
         expect(chef_run).to run_execute(after_cache_cmd).with(command: yum_makecache_cmd)
         expect(chef_run).to_not run_execute(before_cache_cmd)
+        expect(chef_run).to_not run_execute(cache_clean_cmd)
+
+        exe = chef_run.execute(cache_clean_cmd)
+        expect(exe).to do_nothing
+      end
+
+      it 'installs yum group fatal_cache_group with flush_cache after and fatal cache errors' do
+        before_cache_cmd = 'yum makecache before install fatal_cache_group'
+        after_cache_cmd  = 'yum makecache after install fatal_cache_group'
+        cache_clean_cmd  = 'yum clean metadata after install fatal_cache_group'
+
+        expect(chef_run).to install_yumgroup('install with fatal cache errors').with(flush_cache: [:after])
+        expect(chef_run).to run_execute 'yum -d0 -e0 -y  groupinstall \'fatal_cache_group\''
+
+        expect(chef_run).to run_execute(after_cache_cmd).with(command: yum_makecache_cmd)
+        expect(chef_run).to_not run_execute(before_cache_cmd)
+        expect(chef_run).to run_execute(cache_clean_cmd)
+      end
+
+      it 'upgrades yum group fatal_cache_group with flush_cache before and fatal cache errors' do
+        before_cache_cmd = 'yum makecache before upgrade fatal_cache_group'
+        after_cache_cmd  = 'yum makecache after upgrade fatal_cache_group'
+        cache_clean_cmd  = 'yum clean metadata before upgrade fatal_cache_group'
+
+        expect(chef_run).to upgrade_yumgroup('upgrade with fatal cache errors').with(flush_cache: [:before])
+        expect(chef_run).to run_execute 'yum -d0 -e0 -y  groupupdate \'fatal_cache_group\''
+
+        expect(chef_run).to run_execute(before_cache_cmd).with(command: yum_makecache_cmd)
+        expect(chef_run).to_not run_execute(after_cache_cmd)
+        expect(chef_run).to run_execute(cache_clean_cmd)
+      end
+
+      it 'installs yum group fatal_cache_group with fatal cache errors, but no flush cache' do
+        before_cache_cmd = 'yum makecache before install no_flush_fatal_cache_group'
+        after_cache_cmd  = 'yum makecache after install no_flush_fatal_cache_group'
+        before_cache_clean_cmd = 'yum clean metadata before install no_flush_fatal_cache_group'
+        after_cache_clean_cmd  = 'yum clean metadata after install no_flush_fatal_cache_group'
+
+        expect(chef_run).to install_yumgroup('install with fatal cache errors, but no flush').with(flush_cache: [])
+        expect(chef_run).to run_execute 'yum -d0 -e0 -y  groupinstall \'no_flush_fatal_cache_group\''
+
+        expect(chef_run).to_not run_execute(before_cache_cmd)
+        expect(chef_run).to_not run_execute(after_cache_cmd)
+        expect(chef_run).to_not run_execute(before_cache_clean_cmd)
+        expect(chef_run).to_not run_execute(after_cache_clean_cmd)
       end
     end
   end

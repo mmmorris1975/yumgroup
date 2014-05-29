@@ -24,3 +24,23 @@ yumgroup 'upgrade with flush_cache' do
   flush_cache [:after]
   action :upgrade
 end
+
+yumgroup 'install with fatal cache errors' do
+  group 'fatal_cache_group'
+  flush_cache [:after]
+  cache_error_fatal true
+  action :install
+end
+
+yumgroup 'upgrade with fatal cache errors' do
+  group 'fatal_cache_group'
+  flush_cache [:before]
+  cache_error_fatal true
+  action :upgrade
+end
+
+yumgroup 'install with fatal cache errors, but no flush' do
+  group 'no_flush_fatal_cache_group'
+  cache_error_fatal true
+  action :install
+end

@@ -1,0 +1,6 @@
+[bogus]
+name=An invalid YUM repository
+baseurl=http://333.333.333.333/path/to/repo
+enabled=1
+gpgcheck=0
+sslverify=1

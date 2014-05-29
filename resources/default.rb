@@ -8,3 +8,4 @@ attribute :group, kind_of: String, name_attribute: true, required: true
 attribute :options, kind_of: String
 
 attribute :flush_cache, kind_of: Array, default: []
+attribute :cache_error_fatal, kind_of: [TrueClass, FalseClass], default: false
