@@ -4,7 +4,8 @@
 # and dirty now.
 #
 # First TODOs:
-#  - Fail if specified group does not exist for :install and :upgrade
+#  - Provide a do_nothing capability to say that no action was taken to make notifications work in a sane way
+#  - Fail if specified group does not exist for :install and :upgrade (configurable?)
 #  - Do _not_ fail if group is not installed during :remove
 
 # Support whyrun

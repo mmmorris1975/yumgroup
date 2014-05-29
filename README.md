@@ -8,7 +8,7 @@ Requirements
 
 #### platforms
 Any platform that supports installing packages via yum using yum groups.  
-NOTE: Fedora 18 will work with the :install and :upgrade actions, however the :remove action may be flaky, and attempt to delete everything in the dependency tree (regardless of the value of the groupremove_leaf_only setting!)
+NOTE: Fedora 18 will work with the :install and :upgrade actions, however the :remove action may be flaky, and attempt to delete everything in the dependency tree (regardless of the value of the groupremove\_leaf\_only setting!)
 
 Usage
 -----
@@ -23,6 +23,11 @@ yumgroup 'Web Server' do
   action :install
 end
 ```
+
+The yumgroup lwrp provides 2 additional attributes that can be set to control its behavior:
+
+* flush\_cache - Update the yum metadata cache before or after the yum action (similar to the yum\_package resource)
+* cache\_error\_fatal - Make updates of the metadata cache fatal (by default they are not)
 
 Contributing
 ------------
