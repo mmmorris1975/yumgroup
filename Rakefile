@@ -88,9 +88,6 @@ task :release, [:type] => [:clean, :test, 'kitchen:all'] do |_t, args|
   sh "bundle exec knife spork bump #{cb_name} #{type}"
 end
 
-task :bundle => [:release] do
-  sh "bundle exec knife cookbook metadata #{cb_name}"
-
-  ::Dir.chdir(::File.join(cb_dir, '..'))
-  sh "tar --exclude-backups --exclude-vcs -cvf #{cb_name}.tar #{cb_name}"
+task :upload => [:release] do
+  sh "bundle exec knife cookbook site share #{cb_name} 'Utilities'" -c ~/.knife_opscode.rb
 end

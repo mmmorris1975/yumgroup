@@ -12,4 +12,5 @@ group :test do
   gem 'rubocop'
   gem 'test-kitchen'
   gem 'kitchen-vagrant'
+  gem 'vagrant-wrapper'
 end

@@ -12,3 +12,7 @@ yumgroup CHANGELOG
 0.3.0
 -----
 - [michael.m.morris@gmail.com] - Added lwrp option to make failures of metadata cache updates fatal
+
+0.3.1
+-----
+- [michael.m.morris@gmail.com] - Changed bundle process from tar to 'knife cookbook site share'
