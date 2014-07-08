@@ -5,6 +5,7 @@ A LWRP to install yum packages based on yum groups. This is a stop gap measure w
 
 Requirements
 ------------
+Ruby 1.9 or later
 
 #### platforms
 Any platform that supports installing packages via yum using yum groups.  
