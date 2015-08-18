@@ -48,7 +48,6 @@ task :test do
   if ::File.exist?(::File.join(cb_dir, 'Strainerfile'))
     sh 'bundle exec strainer test' if ::File.exist?(::File.join(cb_dir, 'Strainerfile'))
   else
-    Rake::Task[:knife_test].execute
     Rake::Task[:foodcritic].execute
     Rake::Task[:rubocop].execute
     Rake::Task[:chefspec].execute
@@ -89,5 +88,5 @@ task :release, [:type] => [:clean, :test, 'kitchen:all'] do |_t, args|
 end
 
 task :upload => [:release] do
-  sh "bundle exec knife cookbook site share #{cb_name} 'Utilities'" -c ~/.knife_opscode.rb
+  sh "bundle exec knife cookbook site share #{cb_name} 'Utilities' -c ~/.knife_opscode.rb"
 end
