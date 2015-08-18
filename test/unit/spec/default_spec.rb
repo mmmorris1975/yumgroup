@@ -1,9 +1,9 @@
-require 'spec_helper'
+require_relative 'spec_helper'
 
 platforms = {
-  redhat: %w(6.3 6.4 6.5),
-  centos: %w(6.3 6.4 6.5),
-  fedora: %w(18 19 20)
+  redhat: %w(6.3 6.4 6.5 7.0),
+  centos: %w(6.3 6.4 6.5 7.0),
+  fedora: %w(18 19 20 21)
 }
 
 yum_makecache_cmd = 'yum -d0 -e0 -y makecache'
@@ -13,7 +13,7 @@ platforms.each_pair do |p, v|
     describe 'yumgroup::_chefspec' do
       # Use an explicit subject
       let(:chef_run) do
-        ChefSpec::Runner.new(platform: p.to_s, version: ver, log_level: :warn, step_into: ['yumgroup']) do |node|
+        ChefSpec::SoloRunner.new(platform: p.to_s, version: ver, log_level: :error, step_into: ['yumgroup']) do |node|
           Chef::Log.debug(format('#### FILE: %s  PLATFORM: %s  VERSION: %s ####', ::File.basename(__FILE__), p, ver))
 
           node.set['hostname'] = 'testhost'

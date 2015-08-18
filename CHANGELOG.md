@@ -16,3 +16,7 @@ yumgroup CHANGELOG
 0.3.1
 -----
 - [michael.m.morris@gmail.com] - Changed bundle process from tar to 'knife cookbook site share'
+
+0.4.0
+-----
+- [michael.m.morris@gmail.com] - Changes to test and use Chef 12
