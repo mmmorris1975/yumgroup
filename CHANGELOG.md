@@ -19,4 +19,4 @@ yumgroup CHANGELOG
 
 0.4.0
 -----
-- [michael.m.morris@gmail.com] - Changes to test and use Chef 12
+- [michael.m.morris@gmail.com] - Changes to test and use Chef 12 (should still be Chef 11 compliant!)

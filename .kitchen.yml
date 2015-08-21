@@ -8,6 +8,10 @@ driver:
 provisioner:
   name: chef_zero
 
+# Let's make it a policy that we'll keep no more than
+# 3 major revs of a given platform. That should fall
+# close to, or better than, the version support provided by
+# the distribution (ex. remove Centos 5 when Centos 8 is added)
 platforms:
   - name: centos-5.10
   - name: centos-6.5
