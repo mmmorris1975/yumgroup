@@ -20,15 +20,13 @@ platforms.each_pair do |p, v|
         end.converge(described_recipe)
       end
 
-      let(:shellout) do
+      let!(:shellout) do
         double(run_command: 'yum grouplist -e0', error!: nil, stdout: 'Installed Groups:\n\ttest_group', stderr: 'test_group')
       end
-      before do
-        Mixlib::ShellOut.stub(:new).and_return(shellout)
-      end
+      before { allow(Mixlib::ShellOut).to receive(:new).and_return(shellout) }
 
       it 'installs yum group test_group' do
-        shellout.stub(:stdout).and_return('None')
+        allow(shellout).to receive(:stdout).and_return('nope')
         before_cache_cmd = 'yum makecache before install test_group'
         after_cache_cmd  = 'yum makecache after install test_group'
 
@@ -51,7 +49,7 @@ platforms.each_pair do |p, v|
       end
 
       it 'removes yum group test_group' do
-        shellout.stub(:stdout).and_return("Installed Groups:\n\ttest_group")
+        allow(shellout).to receive(:stdout).and_return("Installed Groups:\n\ttest_group")
         before_cache_cmd = 'yum makecache before remove test_group'
         after_cache_cmd  = 'yum makecache after remove test_group'
 
@@ -137,3 +135,4 @@ platforms.each_pair do |p, v|
     end
   end
 end
+
