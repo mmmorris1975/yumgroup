@@ -127,4 +127,3 @@ action :remove do
     Chef::Log.info "#{@current_resource} Not Installed"
   end
 end
-
