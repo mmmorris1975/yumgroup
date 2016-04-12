@@ -18,12 +18,12 @@ end
 
 def load_current_resource
   @current_resource = Chef::Resource::Yumgroup.new(new_resource)
-  @current_resource.name(@new_resource.name)
+  @current_resource.name(@new_resource.group)
   @current_resource.exists = group_installed?
 end
 
 def group_installed?
-  installed_groups.include?(@current_resource.name)
+  installed_groups.include?(@current_resource.group)
 end
 
 def installed_groups
@@ -127,3 +127,4 @@ action :remove do
     Chef::Log.info "#{@current_resource} Not Installed"
   end
 end
+
