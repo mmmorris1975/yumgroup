@@ -20,7 +20,9 @@ platforms.each_pair do |p, v|
         end.converge(described_recipe)
       end
 
-      let(:shellout) { double(run_command: 'yum grouplist -e0', error!: nil, stdout: 'Installed Groups:\n\ttest_group', stderr: 'test_group') }
+      let(:shellout) do
+        double(run_command: 'yum grouplist -e0', error!: nil, stdout: 'Installed Groups:\n\ttest_group', stderr: 'test_group')
+      end
       before do
         Mixlib::ShellOut.stub(:new).and_return(shellout)
       end
@@ -135,4 +137,3 @@ platforms.each_pair do |p, v|
     end
   end
 end
-
