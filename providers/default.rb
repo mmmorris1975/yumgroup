@@ -22,12 +22,20 @@ def load_current_resource
   @current_resource.exists = group_installed?
 end
 
+def rhel_version
+  cmd = 'rpm -q --qf "%{VERSION}\n" -f /etc/redhat-release'
+  os_ver = Mixlib::ShellOut.new(cmd)
+  os_ver.run_command
+  os_ver.stdout.chomp.to_f
+end
+
 def group_installed?
   installed_groups.include?(@current_resource.group)
 end
 
 def installed_groups
   cmd = 'yum grouplist -e0'
+  cmd << ' installed hidden' if rhel_version >= 7.0
   get_group_list = Mixlib::ShellOut.new(cmd)
   get_group_list.run_command
   my_installed_groups = []
