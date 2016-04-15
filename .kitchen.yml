@@ -16,9 +16,8 @@ platforms:
   - name: centos-5.10
   - name: centos-6.5
   - name: centos-7.0
-  - name: fedora-19
-  - name: fedora-20
   - name: fedora-21
+  - name: fedora-22
 
 suites:
   - name: install
