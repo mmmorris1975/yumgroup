@@ -7,10 +7,42 @@
 #  - Provide a do_nothing capability to say that no action was taken to make notifications work in a sane way
 #  - Fail if specified group does not exist for :install and :upgrade (configurable?)
 #  - Do _not_ fail if group is not installed during :remove
+require 'chef/mixin/shell_out'
+include Chef::Mixin::ShellOut
 
+use_inline_resources
 # Support whyrun
 def whyrun_supported?
   true
+end
+
+def load_current_resource
+  @current_resource = Chef::Resource::Yumgroup.new(new_resource)
+  @current_resource.name(@new_resource.group)
+  @current_resource.exists = group_installed?
+end
+
+def group_installed?
+  installed_groups.include?(@current_resource.group)
+end
+
+def installed_groups
+  cmd = 'yum grouplist -e0'
+  get_group_list = Mixlib::ShellOut.new(cmd)
+  get_group_list.run_command
+  my_installed_groups = []
+  installed = false
+  get_group_list.stdout.split("\n").each do |line|
+    case line
+    when /^(Available).*:$/
+      installed = false
+    when /^(Installed).*:$/
+      installed = true
+    when installed && /^\s+(.*)/
+      my_installed_groups.push(Regexp.last_match(1))
+    end
+  end
+  my_installed_groups
 end
 
 # This is the same base yum command Chef's yum_package resource uses.
@@ -46,14 +78,17 @@ action :install do
   # group_package_types. By default, this is 'mandatory' (which appears to include all
   # 'default' packages, as well), but could also be 'optional', or 'default'. We'll keep
   # this default behavior, and allow someone to change it via the options attribute.
+  if @current_resource.exists
+    Chef::Log.info "#{@current_resource} Already Installed"
+  else
+    grp = @new_resource.group
+    cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupinstall '#{grp}'"
 
-  grp = @new_resource.group
-  cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupinstall '#{grp}'"
-
-  converge_by "Installing yum group #{grp}" do
-    flush_cache(@new_resource, 'before', 'install', grp)
-    execute cmd
-    flush_cache(@new_resource, 'after', 'install', grp)
+    converge_by "Installing yum group #{grp}" do
+      flush_cache(@new_resource, 'before', 'install', grp)
+      execute cmd
+      flush_cache(@new_resource, 'after', 'install', grp)
+    end
   end
 end
 
@@ -79,13 +114,16 @@ action :remove do
   # this action could have wide, and unexpected, consequences.  The groupremove_leaf_only
   # config option can be used to change this behavior to only remove packages which are
   # not required by other installed packages.
+  if @current_resource.exists
+    grp = @new_resource.group
+    cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupremove '#{grp}'"
 
-  grp = @new_resource.group
-  cmd = yum_base_cmd + " #{shell_sanitize(@new_resource.options)} groupremove '#{grp}'"
-
-  converge_by "Deleting yum group #{grp}" do
-    flush_cache(@new_resource, 'before', 'remove', grp)
-    execute cmd
-    flush_cache(@new_resource, 'after', 'remove', grp)
+    converge_by "Deleting yum group #{grp}" do
+      flush_cache(@new_resource, 'before', 'remove', grp)
+      execute cmd
+      flush_cache(@new_resource, 'after', 'remove', grp)
+    end
+  else
+    Chef::Log.info "#{@current_resource} Not Installed"
   end
 end
