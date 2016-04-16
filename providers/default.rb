@@ -23,7 +23,7 @@ def load_current_resource
 end
 
 def rhel_version
-  cmd = 'rpm -q --qf "%{VERSION}\n" -f /etc/redhat-release'
+  cmd = 'rpm -q --qf "%{VERSION}" -f /etc/redhat-release'
   os_ver = Mixlib::ShellOut.new(cmd)
   os_ver.run_command
   os_ver.stdout.chomp.to_f
@@ -35,21 +35,26 @@ end
 
 def installed_groups
   cmd = 'yum grouplist -e0'
-  cmd << ' installed hidden' if rhel_version >= 7.0
+  cmd << ' installed hidden ids' if rhel_version >= 7.0
+
   get_group_list = Mixlib::ShellOut.new(cmd)
   get_group_list.run_command
+
   my_installed_groups = []
   installed = false
+
   get_group_list.stdout.split("\n").each do |line|
     case line
     when /^(Available).*:$/
       installed = false
     when /^(Installed).*:$/
       installed = true
-    when installed && /^\s+(.*)/
-      my_installed_groups.push(Regexp.last_match(1))
+    when installed && /^\s+([\s\w-]+)(?:\(([\w-]+)\))?/
+      my_installed_groups.push(Regexp.last_match(1).strip)
+      my_installed_groups.push(Regexp.last_match(2))
     end
   end
+
   my_installed_groups
 end
 

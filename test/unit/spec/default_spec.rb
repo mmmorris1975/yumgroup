@@ -21,7 +21,13 @@ platforms.each_pair do |p, v|
       end
 
       let!(:shellout) do
-        double(run_command: 'yum grouplist -e0', error!: nil, stdout: 'Installed Groups:\n\ttest_group', stderr: 'test_group')
+        if ver.to_f < 7.0
+          double(run_command: 'yum grouplist -e0', error!: nil,
+                 stdout: 'Installed Groups:\n\ttest_group', stderr: 'test_group')
+        else
+          double(run_command: 'yum grouplist -e0 installed hidden ids', error!: nil,
+                 stdout: 'Installed Groups:\n\ttest_group (test_group)', stderr: 'test_group')
+        end
       end
       before { allow(Mixlib::ShellOut).to receive(:new).and_return(shellout) }
 
@@ -49,7 +55,11 @@ platforms.each_pair do |p, v|
       end
 
       it 'removes yum group test_group' do
-        allow(shellout).to receive(:stdout).and_return("Installed Groups:\n\ttest_group")
+        if ver.to_f < 7.0
+          allow(shellout).to receive(:stdout).and_return("Installed Groups:\n\ttest_group")
+        else
+          allow(shellout).to receive(:stdout).and_return("Installed Groups:\n\ttest_group (test_group)")
+        end
         before_cache_cmd = 'yum makecache before remove test_group'
         after_cache_cmd  = 'yum makecache after remove test_group'
 

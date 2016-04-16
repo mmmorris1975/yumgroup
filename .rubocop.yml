@@ -21,3 +21,6 @@ HashSyntax:
 GuardClause:
   Exclude:
     - providers/default.rb
+
+Metrics/AbcSize:
+  Max: 17
