@@ -13,13 +13,7 @@ NOTE: Fedora 18 will work with the :install and :upgrade actions, however the :r
 
 Usage
 -----
-#### yumgroup::default
-
-Just include the `yumgroup` recipe in your cookbook to get access to the LWRP:
-
 ```ruby
-include_recipe 'yumgroup'
-
 yumgroup 'Web Server' do
   action :install
 end
