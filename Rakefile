@@ -18,7 +18,7 @@ task :clean do
   end
 end
 
-task :distclean => [:clean] do
+task distclean: [:clean] do
   ::Dir.chdir(cb_dir)
 
   file = ::File.join('..', "#{cb_name}.tar")
@@ -29,14 +29,9 @@ task :knife_test do
   sh "bundle exec knife cookbook test #{cb_name}"
 end
 
-task :fc => [:foodcritic]
-task :foodcritic do
-  sh "bundle exec foodcritic  #{cb_dir}"
-end
-
-task :rc => [:rubocop]
+task rc: [:rubocop]
 task :rubocop do
-  sh "bundle exec rubocop  #{cb_dir}"
+  sh "bundle exec cookstyle  #{cb_dir}"
 end
 
 task :chefspec do
@@ -48,7 +43,6 @@ task :test do
   if ::File.exist?(::File.join(cb_dir, 'Strainerfile'))
     sh 'bundle exec strainer test' if ::File.exist?(::File.join(cb_dir, 'Strainerfile'))
   else
-    Rake::Task[:foodcritic].execute
     Rake::Task[:rubocop].execute
     Rake::Task[:chefspec].execute
   end
@@ -87,6 +81,6 @@ task :release, [:type] => [:clean, :test, 'kitchen:all'] do |_t, args|
   sh "bundle exec knife spork bump #{cb_name} #{type}"
 end
 
-task :upload => [:release] do
+task upload: [:release] do
   sh "bundle exec knife cookbook site share #{cb_name} 'Utilities' -c ~/.knife_opscode.rb"
 end

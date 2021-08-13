@@ -3,7 +3,7 @@ require_relative 'spec_helper'
 platforms = {
   redhat: %w(6.3 6.4 6.5 7.0),
   centos: %w(6.3 6.4 6.5 7.0),
-  fedora: %w(18 19 20 21)
+  fedora: %w(18 19 20 21),
 }
 
 yum_makecache_cmd = 'yum -d0 -e0 -y makecache'

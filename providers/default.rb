@@ -9,15 +9,10 @@
 #  - Do _not_ fail if group is not installed during :remove
 require 'chef/mixin/shell_out'
 include Chef::Mixin::ShellOut
-
-use_inline_resources
 # Support whyrun
-def whyrun_supported?
-  true
-end
 
 def load_current_resource
-  @current_resource = Chef::Resource::resource_for_node(:yumgroup, node).new(new_resource)
+  @current_resource = Chef::Resource.resource_for_node(:yumgroup, node).new(new_resource)
   @current_resource.name(@new_resource.group)
   @current_resource.exists = group_installed?
 end
@@ -45,13 +40,13 @@ def installed_groups
 
   get_group_list.stdout.split("\n").each do |line|
     case line
-      when /^(Available).*:$/
-        installed = false
-      when /^(Installed).*:$/
-        installed = true
-      when installed && /^\s+([\s\w-]+)(?:\(([\w-]+)\))?/
-        my_installed_groups.push(Regexp.last_match(1).strip)
-        my_installed_groups.push(Regexp.last_match(2))
+    when /^(Available).*:$/
+      installed = false
+    when /^(Installed).*:$/
+      installed = true
+    when installed && /^\s+([\s\w-]+)(?:\(([\w-]+)\))?/
+      my_installed_groups.push(Regexp.last_match(1).strip)
+      my_installed_groups.push(Regexp.last_match(2))
     end
   end
 
