@@ -1,12 +1,74 @@
-actions :install, :upgrade, :remove
-default_action :install
+unified_mode true
 
-# The name of the yum group to manage
-attribute :group, kind_of: String, name_attribute: true, required: true
+property :group, String, name_property: true, description: 'Name or ID of the group to install'
 
-# Options to pass to the yum command
-attribute :options, kind_of: String
+property :options, String, default: '', description: 'Any options to pass to the yum/dnf command'
 
-attribute :flush_cache, kind_of: Array, default: []
-attribute :cache_error_fatal, kind_of: [TrueClass, FalseClass], default: false
-attr_accessor :exists
+property :flush_cache, Array, default: []
+property :cache_error_fatal, [true, false], default: false
+
+action_class do
+  include Yumgroup::Cookbook::Helpers
+
+  def package_manager
+    if platform_family?('rhel') && node['platform_version'].to_i == 7
+      # use yum when on CentOS 7
+      'yum -qy'
+    else
+      # otherwise use dnf on C8 / Fedora
+      # (-v is needed to show ids since --ids conflicts with --hidden)
+      'dnf -qy'
+    end
+  end
+
+  def flush_cache(sym, action, name)
+    # If we want cache update errors to be fatal, we need to remove the local metadata so that when yum tries to fetch
+    # the remote data again, it will be seen as a failure. If yum has a local copy it can use, the makecache action will
+    # never fail and fall back to using the local metadata instead of raising an error saying there was a problem
+    # updating the metadata for a repository.
+    #
+    # NOTE: this will make metadata updates take much longer!
+
+    if new_resource.flush_cache.include?(sym.to_sym)
+      execute "clean metadata #{sym} #{action} #{name}" do
+        command "#{package_manager} clean metadata"
+        only_if { new_resource.cache_error_fatal }
+      end
+
+      execute "makecache #{sym} #{action} #{name}" do
+        command "#{package_manager} makecache"
+      end
+    end
+  end
+end
+
+%i(install upgrade).each do |a|
+  action a do
+    # The package type definition in the group can be controlled by a setting called group_package_types. By default,
+    # this is 'mandatory' (which appears to include all 'default' packages, as well), but could also be 'optional', or
+    # 'default'. We'll keep this default behavior, and allow someone to change it via the options attribute.
+
+    flush_cache('before', a, new_resource.group)
+
+    execute "#{package_manager} group #{a} #{new_resource.options} '#{new_resource.group}'" do
+      not_if { installed_groups.include?(new_resource.group) }
+    end
+
+    flush_cache('after', a, new_resource.group)
+  end
+end
+
+action :remove do
+  # Default behavior is to remove every package defined in the group, regardless of the group_package_type. (packages
+  # which depend on the packages in the group we are removing will be erased as well) Since a package could reside in
+  # multiple groups, this action could have wide, and unexpected, consequences.  The groupremove_leaf_only config option
+  # can be used to change this behavior to only remove packages which are not required by other installed packages.
+
+  flush_cache('before', 'remove', new_resource.group)
+
+  execute "#{package_manager} group remove #{new_resource.options} '#{new_resource.group}'" do
+    only_if { installed_groups.include?(new_resource.group) }
+  end
+
+  flush_cache('before', 'remove', new_resource.group)
+end
