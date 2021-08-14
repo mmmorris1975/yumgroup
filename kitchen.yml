@@ -1,0 +1,34 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+  product_name: cinc
+  chef_license: accept-no-persist
+  multiple_converge: 2
+  enforce_idempotency: true
+  deprecations_as_errors: true
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: centos-7
+  - name: centos-8
+  - name: fedora-latest
+
+suites:
+  - name: install
+    run_list:
+      - recipe[yumgroup-test::install]
+  - name: upgrade
+    run_list:
+      - recipe[yumgroup-test::upgrade]
+  - name: remove
+    run_list:
+      - recipe[yumgroup-test::remove]
+    provisioner:
+      # purposefully not idempotent
+      multiple_converge: 1
+      enforce_idempotency: false
