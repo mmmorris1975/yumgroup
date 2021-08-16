@@ -8,7 +8,7 @@ Requirements
 Ruby 1.9 or later
 
 #### platforms
-Any platform that supports installing packages via yum using yum groups.  
+Any platform that supports installing packages via yum using yum groups.
 NOTE: Fedora 18 will work with the :install and :upgrade actions, however the :remove action may be flaky, and attempt to delete everything in the dependency tree (regardless of the value of the groupremove\_leaf\_only setting!)
 
 Usage
@@ -36,5 +36,5 @@ Contributing
 
 License and Authors
 -------------------
-Authors: Mike Morris  
+Authors: Mike Morris
 License: 3-clause BSD

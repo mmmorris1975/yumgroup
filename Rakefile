@@ -25,26 +25,22 @@ task distclean: [:clean] do
   ::File.unlink(file) if ::File.exist? file
 end
 
-task :knife_test do
-  sh "bundle exec knife cookbook test #{cb_name}"
-end
+task knife_test: ['kitchen:all']
 
-task rc: [:rubocop]
-task :rubocop do
-  sh "bundle exec cookstyle  #{cb_dir}"
+task rc: [:cookstyle]
+task rubocop: [:cookstyle]
+task :cookstyle do
+  sh 'bundle exec cookstyle'
 end
 
 task :chefspec do
-  ::Dir.chdir(cb_dir)
   sh 'bundle exec rspec --color --format documentation'
 end
 
+task test: [:cookstyle, :chefspec]
 task :test do
   if ::File.exist?(::File.join(cb_dir, 'Strainerfile'))
     sh 'bundle exec strainer test' if ::File.exist?(::File.join(cb_dir, 'Strainerfile'))
-  else
-    Rake::Task[:rubocop].execute
-    Rake::Task[:chefspec].execute
   end
 end
 

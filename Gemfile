@@ -7,6 +7,7 @@ group :test do
   gem 'cookstyle'
   gem 'kitchen-vagrant'
   gem 'knife-spork'
+  gem 'knife'
   gem 'rake'
   gem 'test-kitchen'
   gem 'vagrant-wrapper'
