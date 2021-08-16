@@ -1,9 +1,7 @@
 unified_mode true
 
-property :group, String, name_property: true, description: 'Name or ID of the group to install'
-
-property :options, String, default: '', description: 'Any options to pass to the yum/dnf command'
-
+property :group, String, name_property: true
+property :options, String
 property :flush_cache, Array, default: []
 property :cache_error_fatal, [true, false], default: false
 
