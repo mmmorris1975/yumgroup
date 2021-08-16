@@ -24,3 +24,11 @@ yumgroup CHANGELOG
 0.5.0
 -----
 - [michael.m.morris@gmail.com] - Resolve #1, add idempotency to :install and :remove lwrp actions.  Many thanks to @thenoid,  @nsdavidson, and @zachsmorgan
+
+1.0.0
+-----
+- [@detjensrobert](https://github.com/detjensrobert)
+  - Refactor legacy LWRP to custom resource
+  - Update test infra to latest tooling
+  - Cookstyle linting fixes
+  - Enable `unified_mode` for Chef 17 compatibility
