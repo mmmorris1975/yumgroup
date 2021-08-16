@@ -80,3 +80,5 @@ end
 task upload: [:release] do
   sh "bundle exec knife cookbook site share #{cb_name} 'Utilities' -c ~/.knife_opscode.rb"
 end
+
+task default: [:test]

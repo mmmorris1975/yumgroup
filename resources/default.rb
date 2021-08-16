@@ -48,6 +48,9 @@ end
     # this is 'mandatory' (which appears to include all 'default' packages, as well), but could also be 'optional', or
     # 'default'. We'll keep this default behavior, and allow someone to change it via the options attribute.
 
+    # do nothing unless on a RHEL distro
+    return unless platform_family?('rhel') || platform?('fedora') # rubocop:disable Lint/NonLocalExitFromIterator
+
     flush_cache('before', a, new_resource.group)
 
     execute "#{package_manager} group #{a} #{new_resource.options} '#{new_resource.group}'" do
@@ -63,6 +66,9 @@ action :remove do
   # which depend on the packages in the group we are removing will be erased as well) Since a package could reside in
   # multiple groups, this action could have wide, and unexpected, consequences.  The groupremove_leaf_only config option
   # can be used to change this behavior to only remove packages which are not required by other installed packages.
+
+  # do nothing unless on a RHEL distro
+  return unless platform_family?('rhel') || platform?('fedora')
 
   flush_cache('before', 'remove', new_resource.group)
 

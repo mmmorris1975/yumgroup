@@ -77,4 +77,14 @@ describe 'yumgroup' do
     it { is_expected.to_not run_execute('dnf -qy group install  \'Installed Group\'') }
     it { is_expected.to run_execute('dnf -qy group remove  \'remove-me\'') }
   end
+
+  context 'on non-rhel' do
+    platform 'ubuntu'
+
+    recipe do
+      yumgroup 'test'
+    end
+
+    it { is_expected.to_not run_execute('dnf -qy group install  \'test\'') }
+  end
 end

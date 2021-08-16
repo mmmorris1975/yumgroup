@@ -32,3 +32,4 @@ yumgroup CHANGELOG
   - Update test infra to latest tooling
   - Cookstyle linting fixes
   - Enable `unified_mode` for Chef 17 compatibility
+  - Guard against non-RHEL distros
