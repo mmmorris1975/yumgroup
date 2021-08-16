@@ -12,20 +12,19 @@ module Yumgroup
                    end
 
         # shell out to get list of groups & ids
-        group_list = Mixlib::ShellOut.new(list_cmd)
-        group_list.run_command
+        group_list = shell_out!(list_cmd).stdout
 
         # create groups file if missing
         # there does not appear to be an actual file to check for, so instead use the warning given by yum
         # DNF does not have this problem so this will be C7 only
-        if group_list.stdout.match?(/There is no installed groups file/)
-          Mixlib::ShellOut.new('yum group mark convert').run_command
+        if group_list.match?(/There is no installed groups file/)
+          shell_out!('yum group mark convert')
           # re-run list comand
-          group_list.run_command
+          group_list = shell_out!(list_cmd).stdout
         end
 
         installed_section = false
-        group_list.stdout.split("\n").map do |g|
+        group_list.split("\n").map do |g|
           installed_section = true if g =~ /Installed (Environment )?Groups:/
           installed_section = false if g =~ /Available (Environment )?Groups:/
           g.match(/^ +(\w.+) \(([a-z\-]+)\)$/) do |match|
