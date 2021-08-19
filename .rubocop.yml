@@ -1,26 +1,4 @@
 AllCops:
-  Exclude:
-    - Rakefile
-
-Encoding:
-  Enabled: false
-
-LineLength:
-  Max: 128
-
-NumericLiterals:
-  Enabled: false
-
-MethodLength:
-  Max: 40
-
-HashSyntax:
-  Exclude:
-    - Rakefile
-
-GuardClause:
-  Exclude:
-    - providers/default.rb
-
-Metrics/AbcSize:
-  Max: 17
+  TargetChefVersion: 17.latest
+Chef/Modernize/FoodcriticComments:
+  Enabled: true
